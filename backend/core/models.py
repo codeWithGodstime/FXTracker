@@ -14,7 +14,6 @@ class BaseModelMixin(models.Model):
         abstract = True
 
 
-
 class Transaction(BaseModelMixin):
     TRANSACTION_TYPES = [
         ('BUY', 'Buy'),
@@ -25,7 +24,6 @@ class Transaction(BaseModelMixin):
     date = models.DateField()
     amount_usd = models.DecimalField(max_digits=16, decimal_places=2)
     rate_naira = models.DecimalField(max_digits=16, decimal_places=2)
-    total_naira = models.DecimalField(max_digits=16, decimal_places=2)
 
     matched_buy_ids = models.JSONField(null=True, blank=True)
     gain_naira = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)

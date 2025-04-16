@@ -5,6 +5,6 @@ from .views import TransactionViewset
 
 router = DefaultRouter()
 
-router.register("", TransactionViewset, basename="transactions")
+router.register("transactions", TransactionViewset, basename="transactions")
 
 urlpatterns = router.urls

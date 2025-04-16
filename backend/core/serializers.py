@@ -3,7 +3,7 @@ from .models import Transaction
 
 class TransactionSerializer:
 
-    class TransactionRetriveSerializer:
+    class TransactionRetriveSerializer(serializers.ModelSerializer):
         class Meta:
             model = Transaction
             fields = (
@@ -11,12 +11,11 @@ class TransactionSerializer:
                 "date",
                 "amount_usd",
                 "rate_naira",
-                "total_naira",
                 "gain_naira",
                 "gain_percent"
             )
 
-    class TransactionCreateSerializer:
+    class TransactionCreateSerializer(serializers.ModelSerializer):
         class Meta:
             model = Transaction
             fields = (
