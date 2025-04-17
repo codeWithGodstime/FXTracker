@@ -19,7 +19,7 @@ INSTALLED_APPS = [
     "corsheaders",
 
     "core"
-]
+]  
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",

@@ -12,7 +12,9 @@ class TransactionSerializer:
                 "amount_usd",
                 "rate_naira",
                 "gain_naira",
-                "gain_percent"
+                "type",
+                "gain_percent",
+                "matched_buy_ids"
             )
 
     class TransactionCreateSerializer(serializers.ModelSerializer):
