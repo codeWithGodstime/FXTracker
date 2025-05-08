@@ -16,7 +16,6 @@ import { getDummyMetrics } from "@/lib/dummy-data"
 export default function DashboardView() {
   const [activeTab, setActiveTab] = useState("overview")
 
-  // Initialize with empty array to prevent null/undefined issues
   const { data: transactions = [], isLoading } = useQuery({
     queryKey: ["transactions"],
     queryFn: fetchTransactions,

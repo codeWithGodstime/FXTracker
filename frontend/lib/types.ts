@@ -1,9 +1,7 @@
 export interface MatchedBuy {
-  id: string
-  date: string
-  amount: number
-  rate: number
-  profit: number
+  buy_id: string
+  amount_used: number
+  naira_rate_used_in_transation: number
 }
 
 export interface Transaction {
@@ -11,11 +9,10 @@ export interface Transaction {
   type: "BUY" | "SELL"
   date: string
   amount: number
-  rate: number
+  naira_rate_used_in_transation: number
   total: number
-  gain: number
-  gainPercentage: number
-  matchedBuys?: MatchedBuy[]
+  gain_percent: number
+  used_buy_info?: MatchedBuy[]
 }
 
 export interface Metrics {

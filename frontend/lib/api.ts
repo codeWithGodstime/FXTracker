@@ -1,17 +1,12 @@
 import type { Transaction } from "./types"
-import { dummyTransactions, generateDummyTransaction } from "./dummy-data"
 
 const API_URL = "http://localhost:8000"
 
-// In-memory storage for transactions
-let transactions: Transaction[] = [...dummyTransactions]
+let transactions: Transaction[]
 
-// Simulate API call to fetch transactions
 export async function fetchTransactions(): Promise<Transaction[]> {
   try {
-    // Simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 500))
-    return [...transactions]
+    return []
   } catch (error) {
     console.error("Error fetching transactions:", error)
     return []
