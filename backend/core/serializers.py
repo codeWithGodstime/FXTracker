@@ -9,12 +9,11 @@ class TransactionSerializer:
             fields = (
                 "id",
                 "date",
-                "amount_usd",
-                "rate_naira",
-                "gain_naira",
+                "amount",
+                "naira_rate_used_in_transation",
                 "type",
                 "gain_percent",
-                "matched_buy_ids"
+                "used_buy_info",
             )
 
     class TransactionCreateSerializer(serializers.ModelSerializer):
@@ -22,7 +21,7 @@ class TransactionSerializer:
             model = Transaction
             fields = (
                 "date",
-                "amount_usd",
-                "rate_naira",
+                "amount",
+                "naira_rate_used_in_transation",
                 "type"
             )
