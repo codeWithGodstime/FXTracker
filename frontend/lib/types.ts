@@ -1,6 +1,7 @@
 export interface MatchedBuy {
   buy_id: string
   amount_used: number
+  date: Date,
   naira_rate_used_in_transation: number
 }
 

@@ -70,7 +70,7 @@ export function TransactionsTable({ transactions = [], isLoading = false }: Tran
       },
     },
     {
-      accessorKey: "rate",
+      accessorKey: "naira_rate_used_in_transation",
       header: ({ column }) => {
         return (
           <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
@@ -80,7 +80,7 @@ export function TransactionsTable({ transactions = [], isLoading = false }: Tran
         )
       },
       cell: ({ row }) => {
-        const rate = Number.parseFloat(row.getValue("rate"))
+        const rate = Number.parseFloat(row.getValue("naira_rate_used_in_transation"))
         return `₦${rate.toLocaleString()}`
       },
     },
@@ -100,7 +100,7 @@ export function TransactionsTable({ transactions = [], isLoading = false }: Tran
       },
     },
     {
-      accessorKey: "gain",
+      accessorKey: "gain_percent",
       header: ({ column }) => {
         return (
           <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
@@ -113,7 +113,7 @@ export function TransactionsTable({ transactions = [], isLoading = false }: Tran
         const type = row.getValue("type") as string
         if (type === "BUY") return "-"
 
-        const gain = Number.parseFloat(row.getValue("gain"))
+        const gain = Number.parseFloat(row.getValue("total"))
         return (
           <span className={gain >= 0 ? "text-green-500" : "text-red-500"}>
             {gain >= 0 ? "+" : ""}₦{gain.toLocaleString()}
@@ -128,7 +128,7 @@ export function TransactionsTable({ transactions = [], isLoading = false }: Tran
         const type = row.getValue("type") as string
         if (type === "BUY") return "-"
 
-        const gainPercentage = Number.parseFloat(row.getValue("gainPercentage"))
+        const gainPercentage = Number.parseFloat(row.getValue("gain_percent"))
         return (
           <span className={gainPercentage >= 0 ? "text-green-500" : "text-red-500"}>
             {gainPercentage >= 0 ? "+" : ""}
@@ -143,7 +143,7 @@ export function TransactionsTable({ transactions = [], isLoading = false }: Tran
         const transaction = row.original
         const isExpanded = expandedRows[transaction.id] || false
 
-        if (transaction.type === "BUY" || !transaction.matchedBuys?.length) {
+        if (transaction.type === "BUY" || !transaction.used_buy_info?.length) {
           return null
         }
 
@@ -226,40 +226,36 @@ export function TransactionsTable({ transactions = [], isLoading = false }: Tran
                     <TableRow
                       key={row.id}
                       data-state={row.getIsSelected() && "selected"}
-                      className={
-                        transaction.type === "SELL" ? (transaction.gain >= 0 ? "bg-green-50" : "bg-red-50") : ""
-                      }
+                      
                     >
                       {row.getVisibleCells().map((cell) => (
                         <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
                       ))}
                     </TableRow>
 
-                    {transaction.type === "SELL" && isExpanded && transaction.matchedBuys && (
-                      <TableRow className="bg-muted/50">
+                    {transaction.type === "SELL" && isExpanded && transaction.used_buy_info && (
+                      <TableRow className="!bg-muted" key={row.id}>
                         <TableCell colSpan={columns.length}>
                           <div className="p-2">
                             <h4 className="font-medium mb-2">Matched Buy Transactions</h4>
                             <div className="space-y-2">
-                              {transaction.matchedBuys.map((matchedBuy: MatchedBuy, index: number) => (
-                                <div key={index} className="grid grid-cols-5 gap-2 text-sm">
+                              {transaction.used_buy_info.map((matchedBuy: MatchedBuy, index: number) => (
+                                <div key={index} className="grid grid-cols-[2fr_1fr_1fr_1fr] gap-2 text-sm">
+                                  <div>
+                                    <span className="text-muted-foreground">ID: </span>₦
+                                    {matchedBuy.buy_id.toLocaleString()}
+                                  </div>
                                   <div>
                                     <span className="text-muted-foreground">Date: </span>
-                                    {formatDate(matchedBuy.date)}
+                                    {matchedBuy.date ? formatDate(matchedBuy?.date) : "-"}
                                   </div>
                                   <div>
                                     <span className="text-muted-foreground">Amount: </span>$
-                                    {matchedBuy.amount.toFixed(2)}
+                                    {matchedBuy.amount_used.toFixed(2)}
                                   </div>
                                   <div>
                                     <span className="text-muted-foreground">Buy Rate: </span>₦
-                                    {matchedBuy.rate.toLocaleString()}
-                                  </div>
-                                  <div>
-                                    <span className="text-muted-foreground">Profit: </span>
-                                    <span className={matchedBuy.profit >= 0 ? "text-green-500" : "text-red-500"}>
-                                      {matchedBuy.profit >= 0 ? "+" : ""}₦{matchedBuy.profit.toLocaleString()}
-                                    </span>
+                                    {matchedBuy.naira_rate_used_in_transation.toLocaleString()}
                                   </div>
                                 </div>
                               ))}

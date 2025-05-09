@@ -32,8 +32,8 @@ import { useToast } from "@/hooks/use-toast"
 const formSchema = z.object({
   type: z.enum(["BUY", "SELL"]),
   date: z.date(),
-  amount_usd: z.coerce.number().positive(),
-  rate_naira: z.coerce.number().positive(),
+  amount: z.coerce.number().positive(),
+  naira_rate_used_in_transation: z.coerce.number().positive(),
 })
 
 type FormValues = z.infer<typeof formSchema>
@@ -53,8 +53,8 @@ export function TransactionForm({ onSuccess }: TransactionFormProps) {
     defaultValues: {
       type: "BUY",
       date: new Date(),
-      amount_usd: undefined,
-      rate_naira: undefined,
+      amount: undefined,
+      naira_rate_used_in_transation: undefined,
     },
   })
 
@@ -79,9 +79,9 @@ export function TransactionForm({ onSuccess }: TransactionFormProps) {
   })
 
   const calculateTotal = () => {
-    const amount_usd = form.watch("amount_usd") || 0
-    const rate_naira = form.watch("rate_naira") || 0
-    return amount_usd * rate_naira
+    const amount = form.watch("amount") || 0
+    const rate_naira = form.watch("naira_rate_used_in_transation") || 0
+    return amount * rate_naira
   }
 
   const onSubmit = (data: FormValues) => {
@@ -170,7 +170,7 @@ export function TransactionForm({ onSuccess }: TransactionFormProps) {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <FormField
               control={form.control}
-              name="amount_usd"
+              name="amount"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Amount (USD)</FormLabel>
@@ -184,7 +184,7 @@ export function TransactionForm({ onSuccess }: TransactionFormProps) {
 
             <FormField
               control={form.control}
-              name="rate_naira"
+              name="naira_rate_used_in_transation"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Exchange Rate (₦ per $)</FormLabel>
@@ -215,8 +215,8 @@ export function TransactionForm({ onSuccess }: TransactionFormProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirm Sell Transaction</AlertDialogTitle>
             <AlertDialogDescription>
-              You are about to record a sell transaction for ${formData?.amount_usd} at ₦{formData?.rate_naira} per USD. Total: ₦
-              {formData ? (formData.amount_usd * formData.rate_naira).toLocaleString() : 0}
+              You are about to record a sell transaction for ${formData?.amount} at ₦{formData?.naira_rate_used_in_transation} per USD. Total: ₦
+              {formData ? (formData.amount * formData.naira_rate_used_in_transation).toLocaleString() : 0}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

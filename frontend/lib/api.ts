@@ -1,12 +1,18 @@
 import type { Transaction } from "./types"
 
-const API_URL = "http://localhost:8000"
-
-let transactions: Transaction[]
+const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000"
 
 export async function fetchTransactions(): Promise<Transaction[]> {
   try {
-    return []
+    const res = await fetch(`${API_URL}/transactions/`, {
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+
+    const responseData = await res.json()
+    
+    return responseData
   } catch (error) {
     console.error("Error fetching transactions:", error)
     return []
