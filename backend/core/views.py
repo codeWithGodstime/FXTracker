@@ -1,9 +1,24 @@
 from django.db import transaction
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, permissions
 from rest_framework.response import Response
+from rest_framework.decorators import action
+from django.contrib.auth import get_user_model
 
 from .models import Transaction
 from .serializers import TransactionSerializer
+
+
+User = get_user_model()
+
+class UserViewset(viewsets.ModelViewSet):
+    serializer_class = None
+    queryset = User.objects.all()
+    permission_classes = []
+
+    @action(methods=['GET'], detail=False)
+    def user_metrics(self, request, *args, **kwargs):
+        # total_sell_transaction_amount, total_buy_transaction_amount, total_amount_of_transaction_made
+        pass
 
 
 class TransactionViewset(viewsets.ModelViewSet):
@@ -66,7 +81,12 @@ class TransactionViewset(viewsets.ModelViewSet):
             profit_amount_transaction = float(current_transaction_total) - float(total_cost)
             gain_percent = (profit_amount_transaction / total_cost) * 100 if total_cost else 0
 
+            data.total = profit_amount_transaction
             data.gain_percent = round(gain_percent, 2)
+            data.save()
+
+        else:
+            data.total = float(data.naira_rate_used_in_transation) * float(data.amount)
             data.save()
 
         response_serializer = self.get_serializer(data)

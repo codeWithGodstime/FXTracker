@@ -26,6 +26,7 @@ class Transaction(BaseModelMixin):
     amount = models.DecimalField(max_digits=16, decimal_places=2)
     naira_rate_used_in_transation = models.DecimalField(max_digits=8, decimal_places=2)
     is_used = models.BooleanField(default=False)
+    total = models.DecimalField(max_digits=16, decimal_places=2, null=True)
     gain_percent = models.DecimalField(max_digits=5, decimal_places=2, null=True)
     used_buy_info = models.JSONField(default=list, null=True, blank=True)
     # [

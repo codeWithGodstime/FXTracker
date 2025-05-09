@@ -13,6 +13,7 @@ class TransactionSerializer:
                 "naira_rate_used_in_transation",
                 "type",
                 "gain_percent",
+                "total",
                 "used_buy_info",
             )
 
