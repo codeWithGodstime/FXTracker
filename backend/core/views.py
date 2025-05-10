@@ -29,16 +29,22 @@ class TransactionViewset(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         serializer = TransactionSerializer.TransactionCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        data = serializer.save()
+        validated_data = serializer.validated_data
 
-        if data.type == "SELL":
-            amount_to_be_sold = float(data.amount)
+        transaction_type = validated_data["type"]
+        date = validated_data['date']
+        amount = float(validated_data["amount"])
+        naira_rate = float(validated_data["naira_rate_used_in_transation"])
+
+        if transaction_type == "SELL":
+            amount_to_be_sold = amount
             total_cost = 0
-            user_buy_transactions = Transaction.objects.filter(type='BUY').order_by('date').filter(is_used=False)
             buy_used = []
 
+            user_buy_transactions = Transaction.objects.filter(type='BUY').order_by('date').filter(is_used=False)
+
             for buy in user_buy_transactions:
-                matched_buy_data = Transaction.objects.filter(type="SELL").exclude(id=data.id).values_list("used_buy_info", flat=True)
+                matched_buy_data = Transaction.objects.exclude(type='BUY').values_list("used_buy_info", flat=True)
 
                 already_used_amount = 0
                 for matched_list in matched_buy_data:
@@ -46,51 +52,58 @@ class TransactionViewset(viewsets.ModelViewSet):
                         for item in matched_list:
                             if item['buy_id'] == str(buy.id):
                                 already_used_amount += item['amount_used']
-                
-                # this to track the used up buy transactions
+
                 if already_used_amount == buy.amount:
                     buy.is_used = True
                     buy.save()
 
                 available = float(buy.amount) - float(already_used_amount)
-
                 if available <= 0:
                     continue
 
                 amount_used = min(available, amount_to_be_sold)
                 buy_used.append({
                     "buy_id": str(buy.id),
-                    "date": buy.date,
+                    "date": str(buy.date),
                     "amount_used": float(amount_used),
                     "naira_rate_used_in_transation": float(buy.naira_rate_used_in_transation),
                 })
 
-                total_cost += float(amount_used) * float(buy.naira_rate_used_in_transation)
-                amount_to_be_sold -= float(amount_used)
+                total_cost += amount_used * float(buy.naira_rate_used_in_transation)
+                amount_to_be_sold -= amount_used
 
                 if amount_to_be_sold <= 0:
                     break
 
             if amount_to_be_sold > 0:
                 return Response(
-                    {"detail": "You dont have enough BUY transactions to complete this sell"},
+                    {"detail": "You don't have enough BUY transactions to complete this SELL."},
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
-            data.used_buy_info = buy_used
-            current_transaction_total = float(data.amount) * float(data.naira_rate_used_in_transation)
-            profit_amount_transaction = float(current_transaction_total) - float(total_cost)
+            current_transaction_total = amount * naira_rate
+            profit_amount_transaction = current_transaction_total - total_cost
             gain_percent = (profit_amount_transaction / total_cost) * 100 if total_cost else 0
 
-            data.total = profit_amount_transaction
-            data.gain_percent = round(gain_percent, 2)
-            data.save()
+            transaction = Transaction.objects.create(
+                type='SELL',
+                date=date,
+                amount=amount,
+                naira_rate_used_in_transation=naira_rate,
+                total=profit_amount_transaction,
+                gain_percent=round(gain_percent, 2),
+                used_buy_info=buy_used,
+            )
 
         else:
-            data.total = float(data.naira_rate_used_in_transation) * float(data.amount)
-            data.save()
+            transaction = Transaction.objects.create(
+                type='BUY',
+                date=date, 
+                amount=amount,
+                naira_rate_used_in_transation=naira_rate,
+                total=amount * naira_rate,
+            )
 
-        response_serializer = self.get_serializer(data)
-        
+        response_serializer = self.get_serializer(transaction)
         return Response(data=response_serializer.data, status=status.HTTP_201_CREATED)
 
