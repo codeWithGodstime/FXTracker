@@ -32,6 +32,7 @@ class Transaction(BaseModelMixin):
     # [
     #     {
     #         "buy_id": 1,
+    #         "date": 12/05/033,
     #         "amount_usd": 100,
     #         "rate_naira": 1100
     #     },

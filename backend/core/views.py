@@ -1,4 +1,5 @@
 from django.db import transaction
+from django.db.models import Sum
 from rest_framework import viewsets, status, permissions
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -107,3 +108,23 @@ class TransactionViewset(viewsets.ModelViewSet):
         response_serializer = self.get_serializer(transaction)
         return Response(data=response_serializer.data, status=status.HTTP_201_CREATED)
 
+    @action(methods=['GET'], detail=False)
+    def user_metrics(self, request, *args, **kwargs):
+
+        total_sell = Transaction.objects.filter(type="SELL")
+        total_buy = Transaction.objects.filter(type="BUY")
+        total_sell_transaction_amount = total_sell.aggregate(Sum("total"))
+        total_buy_transaction_amount = total_buy.aggregate(Sum("total"))
+        remaining_balance = total_buy.filter(is_used=False).aggregate(Sum("total"))
+
+        total_transaction_amount = float(total_buy_transaction_amount['total__sum']) + float(total_sell_transaction_amount['total__sum'])
+        data = {
+            "total_transaction_amount": total_transaction_amount,
+            "remaining_balance": remaining_balance['total__sum'],
+            "total_buy_transaction_amount": total_buy_transaction_amount["total__sum"],
+            "total_sell_transaction_amount": total_sell_transaction_amount["total__sum"],
+            "total_buy_count": total_buy.count(),
+            "total_sell_count": total_sell.count()
+        }
+
+        return Response(data, status=status.HTTP_200_OK)
