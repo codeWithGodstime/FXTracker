@@ -60,6 +60,7 @@ class TransactionViewset(viewsets.ModelViewSet):
                 amount_used = min(available, amount_to_be_sold)
                 buy_used.append({
                     "buy_id": str(buy.id),
+                    "date": buy.date,
                     "amount_used": float(amount_used),
                     "naira_rate_used_in_transation": float(buy.naira_rate_used_in_transation),
                 })
