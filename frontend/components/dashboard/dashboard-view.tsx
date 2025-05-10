@@ -10,8 +10,7 @@ import { TransactionForm } from "@/components/dashboard/transaction-form"
 import { TransactionsTable } from "@/components/dashboard/transactions-table"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { DashboardShell } from "@/components/dashboard/dashboard-shell"
-import { fetchTransactions } from "@/lib/api"
-import { getDummyMetrics } from "@/lib/dummy-data"
+import { fetchTransactions, userMetrics } from "@/lib/api"
 
 export default function DashboardView() {
   const [activeTab, setActiveTab] = useState("overview")
@@ -21,10 +20,11 @@ export default function DashboardView() {
     queryFn: fetchTransactions,
   })
 
-  // Use dummy metrics instead of calculations
-  const metrics = getDummyMetrics()
+  const { data: metrics, isLoading: metricsLoading } = useQuery({
+    queryKey: ["metrics"],
+    queryFn: userMetrics,
+  })
 
-  // Ensure we have a valid array
   const safeTransactions = Array.isArray(transactions) ? transactions : []
 
   return (
@@ -48,7 +48,7 @@ export default function DashboardView() {
                 <CardTitle className="text-sm font-medium">Total USD Bought</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">${metrics?.totalBought?.toFixed(2) || "0.00"}</div>
+                <div className="text-2xl font-bold">N{metrics?.total_buy_transaction_amount?.toFixed(2) || "0.00"}</div>
               </CardContent>
             </Card>
 
@@ -57,7 +57,25 @@ export default function DashboardView() {
                 <CardTitle className="text-sm font-medium">Total USD Sold</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">${metrics?.totalSold?.toFixed(2) || "0.00"}</div>
+                <div className="text-2xl font-bold">{metrics?.total_sell_transaction_amount?.toFixed(2) || "0.00"}</div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Number of USD Sold</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{metrics?.total_sell_count}</div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Number of USD Bought</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{metrics?.total_buy_count}</div>
               </CardContent>
             </Card>
 
@@ -76,10 +94,10 @@ export default function DashboardView() {
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Current USD Balance</CardTitle>
+                <CardTitle className="text-sm font-medium">Current Balance</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">${metrics?.currentBalance?.toFixed(2) || "0.00"}</div>
+                <div className="text-2xl font-bold">${metrics?.remaining_balance?.toFixed(2) || "0.00"}</div>
               </CardContent>
             </Card>
           </div>

@@ -17,10 +17,12 @@ export interface Transaction {
 }
 
 export interface Metrics {
-  totalBought: number
-  totalSold: number
-  netGain: number
-  currentBalance: number
+  total_transaction_amount: number
+  remaining_balance: number
+  total_buy_transaction_amount: number
+  total_sell_transaction_amount: number
+  total_buy_count: number,
+  total_sell_count: number,
   profitOverTime: {
     date: string
     profit: number

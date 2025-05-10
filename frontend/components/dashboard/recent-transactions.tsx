@@ -6,6 +6,7 @@ interface RecentTransactionsProps {
   transactions: Transaction[]
 }
 
+
 export function RecentTransactions({ transactions = [] }: RecentTransactionsProps) {
   if (!transactions || !transactions.length) {
     return <p className="text-sm text-muted-foreground">No transactions yet</p>
