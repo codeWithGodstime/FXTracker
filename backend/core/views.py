@@ -1,6 +1,10 @@
 from django.db import transaction
 from django.db.models import Sum
 from rest_framework import viewsets, status, permissions
+from django.db.models.functions import TruncMonth, TruncYear
+from datetime import datetime, timedelta
+from collections import defaultdict
+from django.utils.timezone import now
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.contrib.auth import get_user_model
@@ -128,3 +132,49 @@ class TransactionViewset(viewsets.ModelViewSet):
         }
 
         return Response(data, status=status.HTTP_200_OK)
+
+    @action(methods=['GET'], detail=False )
+    def get_profit_summary(self, request, *args, **kwargs):
+        current_year = now().year
+
+        # Step 1: Get real monthly profit data
+        monthly_data_raw = (
+            Transaction.objects.filter(type="SELL")
+            .annotate(month=TruncMonth("date"))
+            .values("month")
+            .annotate(total_profit=Sum("total"))
+            .order_by("month")
+        )
+
+        # Step 2: Build a full list of months for the current year
+        full_months = [
+            datetime(current_year, month, 1) for month in range(1, 13)
+        ]
+        monthly_data_dict = {item["month"].strftime("%Y-%m"): item["total_profit"] for item in monthly_data_raw}
+
+        monthly_data = [
+            {
+                "month": m.strftime("%Y-%m"),
+                "total_profit": monthly_data_dict.get(m.strftime("%Y-%m"), 0)
+            }
+            for m in full_months
+        ]
+
+        # Step 3: Yearly profit (no need to pad with zeroes here)
+        yearly_data = (
+            Transaction.objects.filter(type="SELL")
+            .annotate(year=TruncYear("date"))
+            .values("year")
+            .annotate(total_profit=Sum("total"))
+            .order_by("year")
+        )
+
+        data = {
+            "monthly": monthly_data,
+            "yearly": [
+                {"year": item["year"].strftime("%Y"), "total_profit": item["total_profit"]}
+                for item in yearly_data
+            ],
+        }
+
+        return Response(data)
