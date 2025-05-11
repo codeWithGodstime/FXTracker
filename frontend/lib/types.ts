@@ -1,3 +1,5 @@
+import { Interface } from "readline"
+
 export interface MatchedBuy {
   buy_id: string
   amount_used: number
@@ -27,4 +29,19 @@ export interface Metrics {
     date: string
     profit: number
   }[]
+}
+
+interface MonthlyProfit {
+  month: string;
+  total_profit: number;
+}
+
+interface YearlyProfit {
+  year: string;
+  total_profit: number;
+}
+
+export interface OverviewInterface {
+  monthly: MonthlyProfit
+  yearly: YearlyProfit
 }

@@ -2,17 +2,22 @@
 
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 import { ChartWrapper, TooltipWrapper, TooltipContent } from "@/components/ui/chart"
+import { OverviewInterface } from "@/lib/types";
 
 interface OverviewProps {
-  data: {
-    date: string
-    profit: number
-  }[]
+  data: OverviewInterface;
+  view: 'monthly' | 'yearly'; 
 }
 
-export function Overview({ data = [] }: OverviewProps) {
+export function Overview({ data, view="monthly" }: OverviewProps) {
   // Ensure we have valid data
-  const safeData = Array.isArray(data) ? data : []
+  const viewData = view === 'monthly' ? data.monthly : data.yearly;
+  const safeData = Array.isArray(viewData) ? viewData : []
+  const chartData = safeData.map((item) => ({
+    date: view === 'monthly' ? item.month : item.year,
+    profit: item.total_profit,
+  }));
+  console.log(safeData)
 
   // If no data, show empty chart with placeholder
   if (safeData.length === 0) {
@@ -54,7 +59,7 @@ export function Overview({ data = [] }: OverviewProps) {
     >
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart
-          data={safeData}
+          data={chartData}
           margin={{
             top: 20,
             right: 0,

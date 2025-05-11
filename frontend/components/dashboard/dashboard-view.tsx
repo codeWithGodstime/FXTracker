@@ -10,7 +10,7 @@ import { TransactionForm } from "@/components/dashboard/transaction-form"
 import { TransactionsTable } from "@/components/dashboard/transactions-table"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { DashboardShell } from "@/components/dashboard/dashboard-shell"
-import { fetchTransactions, userMetrics } from "@/lib/api"
+import { fetchTransactions, userMetrics, profitSummary } from "@/lib/api"
 
 export default function DashboardView() {
   const [activeTab, setActiveTab] = useState("overview")
@@ -23,6 +23,11 @@ export default function DashboardView() {
   const { data: metrics, isLoading: metricsLoading } = useQuery({
     queryKey: ["metrics"],
     queryFn: userMetrics,
+  })
+
+  const { data: profitOverTime, isLoading: profitLoading } = useQuery({
+    queryKey: ["profitOvertime"],
+    queryFn: profitSummary,
   })
 
   const safeTransactions = Array.isArray(transactions) ? transactions : []
@@ -108,7 +113,7 @@ export default function DashboardView() {
                 <CardTitle>Profit Over Time</CardTitle>
               </CardHeader>
               <CardContent className="pl-2">
-                <Overview data={metrics?.profitOverTime || []} />
+                <Overview data={profitOverTime || []} />
               </CardContent>
             </Card>
 

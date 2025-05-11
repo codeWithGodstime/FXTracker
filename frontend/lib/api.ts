@@ -1,4 +1,4 @@
-import type { Metrics, Transaction } from "./types"
+import type { Metrics, Overview, Transaction } from "./types"
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000"
 
@@ -47,6 +47,24 @@ export async function userMetrics(): Promise<Metrics> {
   try {
 
     const res = await fetch(`${API_URL}/transactions/user_metrics/`, {
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+
+    const responseData = await res.json()
+
+    return responseData
+  } catch (error) {
+    console.error("Error fetching user transaction metrics:", error)
+    throw new Error("Failed to fetch user transaction metrics")
+  }
+}
+
+export async function profitSummary(): Promise<Overview> {
+  try {
+
+    const res = await fetch(`${API_URL}/transactions/get_profit_summary/`, {
       headers: {
         "Content-Type": "application/json"
       }
